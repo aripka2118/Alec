@@ -36,14 +36,26 @@ class Baby:
         self.feedings = 0
         self.drinks = 0
 
-    def eat(self):
+    def eat(self, food="vegetables"):
         self.weightOZ += 11
         self.feedings += 1
-        self.mood = "Happy"
-        
-        print("\nBaby: Yum Yum in my Tum Tum!")
+        if food == "vegetables":
+            self.cry()
+        elif food == "fruit" or food == "goodies":
+            self.laugh()
+        elif food == "cereal":
+            self.sleep()
+        else:
+            print("\nBaby: Yum Yum in my Tum Tum!")
+            self.mood = "Content"
+
         if self.feedings % 3 == 0:
             self.poop()
+        self.check_burp()
+
+    def check_burp(self):
+        if (self.feedings + self.drinks) % 3 == 0:
+            self.burp()
 
     def drink(self):
         self.weightOZ += 8
@@ -52,18 +64,25 @@ class Baby:
         print("\nBaby: This has quenched my thirst very well.")
         if self.drinks % 3 == 0:
             self.pee()
+        self.check_burp()
 
     def poop(self):
         print("-Baby poops-")
         self.weightOZ -= 5
+        self.mood = "Content"
 
     def pee(self):
         print("-Baby pees-")
-        self.weightOZ -= 3
+        self.weightOZ -= 4
+        self.mood = "Content"
 
     def laugh(self):
         print("\nHAHAHAHAHAHAHAHAHA")
         self.mood = "Happy"
+
+    def scream(self):
+        print("\nAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAH!")
+        self.mood = "Mad"
 
     def cry(self):
         print("\nBaby: WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAAAAAAA!")
@@ -72,6 +91,10 @@ class Baby:
     def sleep(self):
         print("\n-Baby falls asleep dreaming about puppies-")
         self.mood = "Content"
+
+    def burp(self):
+        print("-Baby burps-")
+        self.mood = "Happy"
 
     def introduce(self):
         thing = random.choice(FUNNY_THINGS)
@@ -133,7 +156,21 @@ while(babyLoop):
     userInput = input("Please type a command: ").lower()
 
     if userInput == "eat":
-        baby.eat()
+        foods = {"1": "vegetables", "2": "fruit", "3": "goodies", "4": "cereal"}
+        while True:
+            print("\n-- Food List --")
+            print("1. Vegetables")
+            print("2. Fruit")
+            print("3. Goodies")
+            print("4. Cereal")
+            print("5. Exit")
+            choice = input("Pick a food (1-5): ").strip()
+            if choice in foods:
+                baby.eat(foods[choice])
+                break
+            elif choice == "5":
+                break
+            print("Please enter a number from 1 to 5.")
     elif userInput == "drink":
         baby.drink()
     elif userInput == "laugh":
@@ -152,7 +189,3 @@ while(babyLoop):
         baby.introduce()
     else:
         print("WRONG COMMAND IDIOT")
-
-    if (baby.drinks % 3 == 0 and baby.feedings % 3 == 0) and (userInput == "eat" or userInput == "drink"):
-        print("-Baby burps-")
-        
