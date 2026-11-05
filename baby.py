@@ -16,46 +16,6 @@ FUNNY_THINGS = [
 def ounces_to_pounds(oz):
     return round(oz/OUNCES_PER_POUND, 2)
 
-def eat(weightOZ, feedings):
-    weightOZ += 11
-    feedings += 1
-    
-    print("\nBaby: Yum Yum in my Tum Tum!")
-    if feedings % 3 == 0:
-        weightOZ = poop(weightOZ)
-
-    return weightOZ, feedings, "Happy"
-
-def drink(weightOZ, drinks):
-    weightOZ += 8
-    drinks += 1
-    print("\nBaby: This has quenched my thirst very well.")
-    if drinks % 3 == 0:
-        weightOZ = pee(weightOZ)
-
-    return weightOZ, drinks, "Content"
-    
-def poop(weightOZ):
-    print("-Baby poops-")
-    weightOZ -= 5
-    return weightOZ
-
-def pee(weightOZ):
-    print("-Baby pees-")
-    weightOZ -= 3
-    return weightOZ
-
-def laugh():
-    print("\nHAHAHAHAHAHAHAHAHA")
-    return "Happy"
-
-def cry():
-    print("\nBaby: WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAAAAAAA!")
-    return "Sad"
-
-def sleep():
-    print("\n-Baby falls asleep dreaming about puppies-")
-    return "Content"
 def age_in_months(birthday):
     born = datetime.strptime(birthday, "%m/%d/%Y").date()
     today = date.today()
@@ -64,26 +24,76 @@ def age_in_months(birthday):
         months -= 1
     return max(months, 0)
 
-def introduce(name, birthday, weightOZ):
-    thing = random.choice(FUNNY_THINGS)
-    print(f"\nBaby: Hi! My name is {name}.")
-    years, months = divmod(age_in_months(birthday), 12)
-    year_text = f"{years} year{'s' if years != 1 else ''}"
-    month_text = f"{months} month{'s' if months != 1 else ''}"
-    print(f"I am {year_text} and {month_text} old and I weigh {ounces_to_pounds(weightOZ)} lbs.")
-    print(f"I really like to {thing}!")
+class Baby:
+    def __init__(self, name, birthday=None, weightOZ=130, height=20):
+        self.name = name
+        if birthday is None:
+            birthday = date.today().strftime("%m/%d/%Y")
+        self.birthday = birthday
+        self.weightOZ = weightOZ
+        self.height = height
+        self.mood = DEFAULT_MOOD
+        self.feedings = 0
+        self.drinks = 0
 
-def display_status(name, birthday, weightOZ, mood, feedings, drinks, height):
-    print("\n--- Baby Status ---")
-    print(f"Name: {name}")
-    print(f"Birthday: {birthday}")
-    print(f"Feedings: {feedings}")
-    print(f"Drinks: {drinks}")
-    print(f"Weight: {weightOZ} oz")
-    print(f"Weight: {ounces_to_pounds(weightOZ)} lbs")
-    print(f"Height: {height} in")
-    print(f"Mood: {mood}")
-    print("-------------------")
+    def eat(self):
+        self.weightOZ += 11
+        self.feedings += 1
+        self.mood = "Happy"
+        
+        print("\nBaby: Yum Yum in my Tum Tum!")
+        if self.feedings % 3 == 0:
+            self.poop()
+
+    def drink(self):
+        self.weightOZ += 8
+        self.drinks += 1
+        self.mood = "Content"
+        print("\nBaby: This has quenched my thirst very well.")
+        if self.drinks % 3 == 0:
+            self.pee()
+
+    def poop(self):
+        print("-Baby poops-")
+        self.weightOZ -= 5
+
+    def pee(self):
+        print("-Baby pees-")
+        self.weightOZ -= 3
+
+    def laugh(self):
+        print("\nHAHAHAHAHAHAHAHAHA")
+        self.mood = "Happy"
+
+    def cry(self):
+        print("\nBaby: WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAAAAAAA!")
+        self.mood = "Sad"
+
+    def sleep(self):
+        print("\n-Baby falls asleep dreaming about puppies-")
+        self.mood = "Content"
+
+    def introduce(self):
+        thing = random.choice(FUNNY_THINGS)
+        print(f"\nBaby: Hi! My name is {self.name}.")
+        years, months = divmod(age_in_months(self.birthday), 12)
+        year_text = f"{years} year{'s' if years != 1 else ''}"
+        month_text = f"{months} month{'s' if months != 1 else ''}"
+        print(f"I am {year_text} and {month_text} old and I weigh {ounces_to_pounds(self.weightOZ)} lbs.")
+        print(f"I really like to {thing}!")
+
+    def display_status(self):
+        print("\n--- Baby Status ---")
+        print(f"Name: {self.name}")
+        print(f"Birthday: {self.birthday}")
+        print(f"Feedings: {self.feedings}")
+        print(f"Drinks: {self.drinks}")
+        print(f"Weight: {self.weightOZ} oz")
+        print(f"Weight: {ounces_to_pounds(self.weightOZ)} lbs")
+        print(f"Height: {self.height} in")
+        print(f"Mood: {self.mood}")
+        print("-------------------")
+
 
 print("What is the baby's name?")
 name = input("Name: ")
@@ -104,9 +114,8 @@ print("\nWhat is your babies height in inches?")
 height = float(input("Height: "))
 
 babyLoop = True
-feedings = 0
-drinks = 0
-mood = DEFAULT_MOOD
+
+baby = Baby(name, birthday, weightOZ, height)
 
 while(babyLoop):
     userInput = ""
@@ -124,26 +133,26 @@ while(babyLoop):
     userInput = input("Please type a command: ").lower()
 
     if userInput == "eat":
-        weightOZ, feedings, mood = eat(weightOZ, feedings)
+        baby.eat()
     elif userInput == "drink":
-        weightOZ, drinks, mood = drink(weightOZ, drinks)
+        baby.drink()
     elif userInput == "laugh":
-        mood = laugh()
+        baby.laugh()
     elif userInput == "sleep":
-        mood = sleep()
+        baby.sleep()
     elif userInput == "cry":
-        mood = cry()
+        baby.cry()
     elif userInput == "status":
-        display_status(name, birthday, weightOZ, mood, feedings, drinks, height)
+        baby.display_status()
     elif userInput == "introduce":
-        introduce(name, birthday, weightOZ)
+        baby.introduce()
     elif userInput == "home":
         babyLoop = False
-        display_status(name, birthday, weightOZ, mood, feedings, drinks, height)
-        introduce(name, birthday, weightOZ)
+        baby.display_status()
+        baby.introduce()
     else:
         print("WRONG COMMAND IDIOT")
 
-    if (drinks % 3 == 0 and feedings % 3 == 0) and (userInput == "eat" or userInput == "drink"):
+    if (baby.drinks % 3 == 0 and baby.feedings % 3 == 0) and (userInput == "eat" or userInput == "drink"):
         print("-Baby burps-")
         
