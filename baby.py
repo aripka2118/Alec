@@ -1,8 +1,14 @@
 import random
+import time
 from datetime import datetime, date
 
 OUNCES_PER_POUND = 16
-DEFAULT_MOOD = "content"
+INPUT_DELAY = 1
+MOOD_CONTENT = "Content"
+MOOD_HAPPY = "Happy"
+MOOD_MAD = "Mad"
+MOOD_SAD = "Sad"
+DEFAULT_MOOD = MOOD_CONTENT
 FUNNY_THINGS = [
     "chew on the TV remote",
     "stare at the ceiling fan like it owes me money",
@@ -31,6 +37,7 @@ class Baby:
             birthday = date.today().strftime("%m/%d/%Y")
         self.birthday = birthday
         self.weightOZ = weightOZ
+        self.startWeightOZ = weightOZ
         self.height = height
         self.mood = DEFAULT_MOOD
         self.feedings = 0
@@ -47,7 +54,7 @@ class Baby:
             self.sleep()
         else:
             print("\nBaby: Yum Yum in my Tum Tum!")
-            self.mood = "Content"
+            self.mood = MOOD_CONTENT
 
         if self.feedings % 3 == 0:
             self.poop()
@@ -60,7 +67,7 @@ class Baby:
     def drink(self):
         self.weightOZ += 8
         self.drinks += 1
-        self.mood = "Content"
+        self.mood = MOOD_CONTENT
         print("\nBaby: This has quenched my thirst very well.")
         if self.drinks % 3 == 0:
             self.pee()
@@ -69,32 +76,35 @@ class Baby:
     def poop(self):
         print("-Baby poops-")
         self.weightOZ -= 5
-        self.mood = "Content"
+        self.mood = MOOD_CONTENT
 
     def pee(self):
         print("-Baby pees-")
         self.weightOZ -= 4
-        self.mood = "Content"
+        self.mood = MOOD_CONTENT
 
     def laugh(self):
         print("\nHAHAHAHAHAHAHAHAHA")
-        self.mood = "Happy"
+        self.mood = MOOD_HAPPY
 
     def scream(self):
         print("\nAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAH!")
-        self.mood = "Mad"
+        self.mood = MOOD_MAD
 
     def cry(self):
         print("\nBaby: WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAAAAAAA!")
-        self.mood = "Sad"
+        self.mood = MOOD_SAD
 
     def sleep(self):
         print("\n-Baby falls asleep dreaming about puppies-")
-        self.mood = "Content"
+        self.mood = MOOD_CONTENT
 
     def burp(self):
         print("-Baby burps-")
-        self.mood = "Happy"
+        self.mood = MOOD_HAPPY
+
+    def has_doubled_weight(self):
+        return self.weightOZ >= self.startWeightOZ * 2
 
     def introduce(self):
         thing = random.choice(FUNNY_THINGS)
@@ -189,3 +199,13 @@ while(babyLoop):
         baby.introduce()
     else:
         print("WRONG COMMAND IDIOT")
+
+    if babyLoop and baby.has_doubled_weight():
+        babyLoop = False
+        print(f"\nCONGRATULATIONS! {baby.name} doubled their starting weight "
+              f"of {baby.startWeightOZ} oz and now weighs {baby.weightOZ} oz "
+              f"({ounces_to_pounds(baby.weightOZ)} lbs)!")
+        baby.display_status()
+
+    if babyLoop:
+        time.sleep(INPUT_DELAY)
