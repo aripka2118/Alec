@@ -10,6 +10,9 @@ DEFAULT_WEIGHT = 130
 FOOD_WEIGHT_GAIN = 11
 DEFAULT_FOOD = "veggies"
 FOOD_LIST = ["veggies", "fruit", "goodies", "cereal"]
+DRINK_WEIGHT_GAIN = 8
+DEFAULT_DRINK = "water"
+DRINK_LIST = ["milk", "water", "soda", "juice"]
 MOOD_CONTENT = "Content"
 MOOD_HAPPY = "Happy"
 MOOD_MAD = "Mad"
@@ -74,10 +77,11 @@ class Baby:
         if (self.feedings + self.drinks) % 3 == 0:
             self.burp()
 
-    def drink(self):
-        self.weight += 8
+    def drink(self, beverage=DEFAULT_DRINK):
+        self.weight += DRINK_WEIGHT_GAIN
         self.drinks += 1
         self.mood = MOOD_CONTENT
+        print(f"\nBaby drank {beverage} and has gained {ounces_to_pounds(DRINK_WEIGHT_GAIN)} lbs")
         print("\nBaby: This has quenched my thirst very well.")
         if self.drinks % 3 == 0:
             self.pee()
@@ -181,6 +185,21 @@ def ask_food():
         print("That food is not on the list.")
 
 
+def ask_drink():
+    print("\n-- Drink List --")
+    for number, beverage in enumerate(DRINK_LIST, 1):
+        print(f"{number}. {beverage}")
+    while True:
+        text = input(f"Choose a drink by number or name (blank = {DEFAULT_DRINK}): ").strip().lower()
+        if text == "":
+            return DEFAULT_DRINK
+        if text.isdigit() and 1 <= int(text) <= len(DRINK_LIST):
+            return DRINK_LIST[int(text) - 1]
+        if text in DRINK_LIST:
+            return text
+        print("That drink is not on the list.")
+
+
 def main():
     name =input("Baby name: ").strip() or "Baby"
     birthday = ask_birthday()
@@ -198,7 +217,7 @@ def main():
         if action == "eat":
             baby.eat(ask_food())
         elif action == "drink":
-            baby.drink()
+            baby.drink(ask_drink())
         elif action == "laugh":
             baby.laugh()
         elif action == "cry":
