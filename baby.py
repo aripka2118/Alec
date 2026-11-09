@@ -2,8 +2,12 @@ import random
 import time
 from datetime import datetime, date
 
+ACTION_DELAY_SECONDS = 1
+
 OUNCES_PER_POUND = 16
-INPUT_DELAY = 1
+DEFAULT_HEIGHT = 20
+DEFAULT_WEIGHT = 130
+DEFAULT_FOOD = "vegetables"
 MOOD_CONTENT = "Content"
 MOOD_HAPPY = "Happy"
 MOOD_MAD = "Mad"
@@ -19,8 +23,10 @@ FUNNY_THINGS = [
     "grab everyone's nose",
 ]
 
+
 def ounces_to_pounds(oz):
-    return round(oz/OUNCES_PER_POUND, 2)
+    return round(oz / OUNCES_PER_POUND, 2)
+
 
 def age_in_months(birthday):
     born = datetime.strptime(birthday, "%m/%d/%Y").date()
@@ -30,23 +36,24 @@ def age_in_months(birthday):
         months -= 1
     return max(months, 0)
 
+
 class Baby:
-    def __init__(self, name, birthday=None, weightOZ=130, height=20):
+    def __init__(self, name, birthday=None, weight=DEFAULT_WEIGHT, height=DEFAULT_HEIGHT):
         self.name = name
         if birthday is None:
             birthday = date.today().strftime("%m/%d/%Y")
         self.birthday = birthday
-        self.weightOZ = weightOZ
-        self.startWeightOZ = weightOZ
+        self.weight = weight
+        self.starting_weight = weight
         self.height = height
         self.mood = DEFAULT_MOOD
         self.feedings = 0
         self.drinks = 0
 
-    def eat(self, food="vegetables"):
-        self.weightOZ += 11
+    def eat(self, food=DEFAULT_FOOD):
+        self.weight += 11
         self.feedings += 1
-        if food == "vegetables":
+        if food == DEFAULT_FOOD:
             self.cry()
         elif food == "fruit" or food == "goodies":
             self.laugh()
@@ -65,7 +72,7 @@ class Baby:
             self.burp()
 
     def drink(self):
-        self.weightOZ += 8
+        self.weight += 8
         self.drinks += 1
         self.mood = MOOD_CONTENT
         print("\nBaby: This has quenched my thirst very well.")
@@ -75,12 +82,12 @@ class Baby:
 
     def poop(self):
         print("-Baby poops-")
-        self.weightOZ -= 5
+        self.weight -= 5
         self.mood = MOOD_CONTENT
 
     def pee(self):
         print("-Baby pees-")
-        self.weightOZ -= 4
+        self.weight -= 4
         self.mood = MOOD_CONTENT
 
     def laugh(self):
@@ -89,6 +96,7 @@ class Baby:
 
     def scream(self):
         print("\nAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAH!")
+        time.sleep(ACTION_DELAY_SECONDS)
         self.mood = MOOD_MAD
 
     def cry(self):
@@ -97,6 +105,7 @@ class Baby:
 
     def sleep(self):
         print("\n-Baby falls asleep dreaming about puppies-")
+        time.sleep(ACTION_DELAY_SECONDS)
         self.mood = MOOD_CONTENT
 
     def burp(self):
@@ -104,7 +113,7 @@ class Baby:
         self.mood = MOOD_HAPPY
 
     def has_doubled_weight(self):
-        return self.weightOZ >= self.startWeightOZ * 2
+        return self.weight >= self.starting_weight * 2
 
     def introduce(self):
         thing = random.choice(FUNNY_THINGS)
@@ -112,7 +121,7 @@ class Baby:
         years, months = divmod(age_in_months(self.birthday), 12)
         year_text = f"{years} year{'s' if years != 1 else ''}"
         month_text = f"{months} month{'s' if months != 1 else ''}"
-        print(f"I am {year_text} and {month_text} old and I weigh {ounces_to_pounds(self.weightOZ)} lbs.")
+        print(f"I am {year_text} and {month_text} old and I weigh {ounces_to_pounds(self.weight)} lbs.")
         print(f"I really like to {thing}!")
 
     def display_status(self):
@@ -121,91 +130,82 @@ class Baby:
         print(f"Birthday: {self.birthday}")
         print(f"Feedings: {self.feedings}")
         print(f"Drinks: {self.drinks}")
-        print(f"Weight: {self.weightOZ} oz")
-        print(f"Weight: {ounces_to_pounds(self.weightOZ)} lbs")
+        print(f"Weight: {self.weight} oz")
+        print(f"Weight: {ounces_to_pounds(self.weight)} lbs")
         print(f"Height: {self.height} in")
         print(f"Mood: {self.mood}")
         print("-------------------")
 
 
-print("What is the baby's name?")
-name = input("Name: ")
+def ask_number(prompt, default, cast):
+    while True:
+        text = input(prompt).strip()
+        if text == "":
+            return default
+        try:
+            value = cast(text)
+            if value > 0:
+                return value
+        except ValueError:
+            pass
+        print(f"Please enter a positive number (or press Enter for {default}).")
 
-print("\nWhat is your baby's birthday? (MM/DD/YYYY)")
-while True:
-    birthday = input("Birthday: ")
-    try:
-        age_in_months(birthday)
-        break
-    except ValueError:
-        print("Please use the format MM/DD/YYYY.")
 
-print("\nWhat is your babies weight in ounces?")
-weightOZ = int(input("Weight: "))
+def ask_birthday():
+    while True:
+        text = input("Birthdate (MM/DD/YYYY, blank = today): ").strip()
+        if text == "":
+            return date.today().strftime("%m/%d/%Y")
+        try:
+            age_in_months(text)
+            return text
+        except ValueError:
+            print("Please use the format MM/DD/YYYY.")
 
-print("\nWhat is your babies height in inches?")
-height = float(input("Height: "))
 
-babyLoop = True
+def main():
+    name = input("Baby name: ").strip() or "Baby"
+    birthday = ask_birthday()
+    height = ask_number(f"Height in inches (blank = {DEFAULT_HEIGHT}): ", DEFAULT_HEIGHT, float)
+    weight = ask_number(f"Starting weight in ounces (blank = {DEFAULT_WEIGHT}): ", DEFAULT_WEIGHT, float)
 
-baby = Baby(name, birthday, weightOZ, height)
+    baby = Baby(name, birthday, weight, height)
+    baby.introduce()
 
-while(babyLoop):
-    userInput = ""
+    while True:
+        print("\n-- Action List --")
+        print("eat, drink, laugh, cry, sleep, scream, status, home")
+        action = input("Please type an action: ").strip().lower()
 
-    print("\n-- Action List --")
-    print("eat")
-    print("drink")
-    print("laugh")
-    print("sleep")
-    print("cry")
-    print("status")
-    print("introduce")
-    print("home")
+        if action == "eat":
+            food = input("What food? (blank = vegetables): ").strip().lower()
+            baby.eat(food or DEFAULT_FOOD)
+        elif action == "drink":
+            baby.drink()
+        elif action == "laugh":
+            baby.laugh()
+        elif action == "cry":
+            baby.cry()
+        elif action == "sleep":
+            baby.sleep()
+        elif action == "scream":
+            baby.scream()
+        elif action == "status":
+            baby.display_status()
+        elif action == "home":
+            print(f"\n{baby.name} is going home.")
+            break
+        else:
+            print(f"'{action}' is not a valid action. Choose: "
+                  "eat, drink, laugh, cry, sleep, scream, status, or home.")
 
-    userInput = input("Please type a command: ").lower()
+        if baby.weight >= baby.starting_weight * 2:
+            print(f"\nCONGRATULATIONS! {baby.name} doubled their starting weight "
+                  f"of {baby.starting_weight} oz!")
+            break
 
-    if userInput == "eat":
-        foods = {"1": "vegetables", "2": "fruit", "3": "goodies", "4": "cereal"}
-        while True:
-            print("\n-- Food List --")
-            print("1. Vegetables")
-            print("2. Fruit")
-            print("3. Goodies")
-            print("4. Cereal")
-            print("5. Exit")
-            choice = input("Pick a food (1-5): ").strip()
-            if choice in foods:
-                baby.eat(foods[choice])
-                break
-            elif choice == "5":
-                break
-            print("Please enter a number from 1 to 5.")
-    elif userInput == "drink":
-        baby.drink()
-    elif userInput == "laugh":
-        baby.laugh()
-    elif userInput == "sleep":
-        baby.sleep()
-    elif userInput == "cry":
-        baby.cry()
-    elif userInput == "status":
-        baby.display_status()
-    elif userInput == "introduce":
-        baby.introduce()
-    elif userInput == "home":
-        babyLoop = False
-        baby.display_status()
-        baby.introduce()
-    else:
-        print("WRONG COMMAND IDIOT")
+    baby.display_status()
 
-    if babyLoop and baby.has_doubled_weight():
-        babyLoop = False
-        print(f"\nCONGRATULATIONS! {baby.name} doubled their starting weight "
-              f"of {baby.startWeightOZ} oz and now weighs {baby.weightOZ} oz "
-              f"({ounces_to_pounds(baby.weightOZ)} lbs)!")
-        baby.display_status()
 
-    if babyLoop:
-        time.sleep(INPUT_DELAY)
+if __name__ == "__main__":
+    main()
