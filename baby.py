@@ -7,7 +7,9 @@ ACTION_DELAY_SECONDS = 1
 OUNCES_PER_POUND = 16
 DEFAULT_HEIGHT = 20
 DEFAULT_WEIGHT = 130
-DEFAULT_FOOD = "vegetables"
+FOOD_WEIGHT_GAIN = 11
+DEFAULT_FOOD = "veggies"
+FOOD_LIST = ["veggies", "fruit", "goodies", "cereal"]
 MOOD_CONTENT = "Content"
 MOOD_HAPPY = "Happy"
 MOOD_MAD = "Mad"
@@ -51,8 +53,9 @@ class Baby:
         self.drinks = 0
 
     def eat(self, food=DEFAULT_FOOD):
-        self.weight += 11
+        self.weight += FOOD_WEIGHT_GAIN
         self.feedings += 1
+        print(f"\nBaby ate {food} and has gained {ounces_to_pounds(FOOD_WEIGHT_GAIN)} lbs")
         if food == DEFAULT_FOOD:
             self.cry()
         elif food == "fruit" or food == "goodies":
@@ -163,8 +166,23 @@ def ask_birthday():
             print("Please use the format MM/DD/YYYY.")
 
 
+def ask_food():
+    print("\n-- Food List --")
+    for number, food in enumerate(FOOD_LIST, 1):
+        print(f"{number}. {food}")
+    while True:
+        text = input(f"Choose a food by number or name (blank = {DEFAULT_FOOD}): ").strip().lower()
+        if text == "":
+            return DEFAULT_FOOD
+        if text.isdigit() and 1 <= int(text) <= len(FOOD_LIST):
+            return FOOD_LIST[int(text) - 1]
+        if text in FOOD_LIST:
+            return text
+        print("That food is not on the list.")
+
+
 def main():
-    name = input("Baby name: ").strip() or "Baby"
+    name =input("Baby name: ").strip() or "Baby"
     birthday = ask_birthday()
     height = ask_number(f"Height in inches (blank = {DEFAULT_HEIGHT}): ", DEFAULT_HEIGHT, float)
     weight = ask_number(f"Starting weight in ounces (blank = {DEFAULT_WEIGHT}): ", DEFAULT_WEIGHT, float)
@@ -178,8 +196,7 @@ def main():
         action = input("Please type an action: ").strip().lower()
 
         if action == "eat":
-            food = input("What food? (blank = vegetables): ").strip().lower()
-            baby.eat(food or DEFAULT_FOOD)
+            baby.eat(ask_food())
         elif action == "drink":
             baby.drink()
         elif action == "laugh":
