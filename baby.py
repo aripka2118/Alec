@@ -28,20 +28,6 @@ FUNNY_THINGS = [
     "grab everyone's nose",
 ]
 
-
-def ounces_to_pounds(oz):
-    return round(oz / OUNCES_PER_POUND, 2)
-
-
-def age_in_months(birthday):
-    born = datetime.strptime(birthday, "%m/%d/%Y").date()
-    today = date.today()
-    months = (today.year - born.year) * 12 + today.month - born.month
-    if today.day < born.day:
-        months -= 1
-    return max(months, 0)
-
-
 class Baby:
     def __init__(self, name, birthday=None, weight=DEFAULT_WEIGHT, height=DEFAULT_HEIGHT):
         self.name = name
@@ -103,7 +89,6 @@ class Baby:
 
     def scream(self):
         print("\nAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAH!")
-        time.sleep(ACTION_DELAY_SECONDS)
         self.mood = MOOD_MAD
 
     def cry(self):
@@ -112,7 +97,6 @@ class Baby:
 
     def sleep(self):
         print("\n-Baby falls asleep dreaming about puppies-")
-        time.sleep(ACTION_DELAY_SECONDS)
         self.mood = MOOD_CONTENT
 
     def burp(self):
@@ -143,6 +127,17 @@ class Baby:
         print(f"Mood: {self.mood}")
         print("-------------------")
 
+def ounces_to_pounds(oz):
+    return round(oz / OUNCES_PER_POUND, 2)
+
+
+def age_in_months(birthday):
+    born = datetime.strptime(birthday, "%m/%d/%Y").date()
+    today = date.today()
+    months = (today.year - born.year) * 12 + today.month - born.month
+    if today.day < born.day:
+        months -= 1
+    return max(months, 0)
 
 def ask_number(prompt, default, cast):
     while True:
@@ -201,7 +196,7 @@ def ask_drink():
 
 
 def main():
-    name =input("Baby name: ").strip() or "Baby"
+    name = input("Baby name: ").strip() or "Baby"
     birthday = ask_birthday()
     height = ask_number(f"Height in inches (blank = {DEFAULT_HEIGHT}): ", DEFAULT_HEIGHT, float)
     weight = ask_number(f"Starting weight in ounces (blank = {DEFAULT_WEIGHT}): ", DEFAULT_WEIGHT, float)
@@ -234,6 +229,9 @@ def main():
         else:
             print(f"'{action}' is not a valid action. Choose: "
                   "eat, drink, laugh, cry, sleep, scream, status, or home.")
+            continue
+
+        time.sleep(ACTION_DELAY_SECONDS)
 
         if baby.weight >= baby.starting_weight * 2:
             print(f"\nCONGRATULATIONS! {baby.name} doubled their starting weight "
